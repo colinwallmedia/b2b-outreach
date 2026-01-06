@@ -3,6 +3,7 @@ import { Users, Mail, MousePointerClick, MessageSquare, Calendar, TrendingUp, Al
 import { KPICard } from '../components/dashboard/KPICard';
 import { supabase } from '../lib/supabase';
 import type { DashboardKPI } from '../types/dashboard';
+import { TestDataControl } from '../components/features/TestDataControl';
 
 const ICON_MAP: Record<string, LucideIcon> = {
     Users,
@@ -61,11 +62,16 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold tracking-tight text-gray-900">Dashboard</h2>
-                <p className="text-muted-foreground mt-1 text-sm text-gray-500">
-                    Overview of your outreach performance and key metrics.
-                </p>
+            <div className="flex justify-between items-start">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight text-gray-900">Dashboard</h2>
+                    <p className="text-muted-foreground mt-1 text-sm text-gray-500">
+                        Overview of your outreach performance and key metrics.
+                    </p>
+                </div>
+                <div className="w-auto">
+                    <TestDataControl />
+                </div>
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
