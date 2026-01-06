@@ -34,7 +34,7 @@ export const fileUploadService = {
         const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
         const filePath = `${userId}/${timestamp}-${sanitizedFilename}`;
 
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
             .from('uploads')
             .upload(filePath, file);
 

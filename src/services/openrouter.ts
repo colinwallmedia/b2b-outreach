@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase'; // Assuming supabase client is available if needed for logging later, or remove if not used yet.
+// import { supabase } from '../lib/supabase'; // Removed unused import
 
 // Types
 export interface Message {
