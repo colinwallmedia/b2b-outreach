@@ -1,15 +1,63 @@
-import { Users, Mail, MousePointerClick, MessageSquare, Calendar, TrendingUp } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Users, Mail, MousePointerClick, MessageSquare, Calendar, TrendingUp, AlertCircle, type LucideIcon } from 'lucide-react';
 import { KPICard } from '../components/dashboard/KPICard';
+import { supabase } from '../lib/supabase';
+import type { DashboardKPI } from '../types/dashboard';
+
+const ICON_MAP: Record<string, LucideIcon> = {
+    Users,
+    Mail,
+    MousePointerClick,
+    MessageSquare,
+    Calendar,
+    TrendingUp,
+};
 
 export default function Dashboard() {
-    const kpis = [
-        { title: 'Total Prospects', value: '2,543', change: '+12.5%', trend: 'up' as const, icon: Users, iconColor: 'text-blue-600' },
-        { title: 'Emails Sent', value: '12,450', change: '+8.2%', trend: 'up' as const, icon: Mail, iconColor: 'text-purple-600' },
-        { title: 'Open Rate', value: '45.2%', change: '-2.1%', trend: 'down' as const, icon: MousePointerClick, iconColor: 'text-yellow-600' },
-        { title: 'Reply Rate', value: '12.8%', change: '+1.4%', trend: 'up' as const, icon: MessageSquare, iconColor: 'text-green-600' },
-        { title: 'Meetings Booked', value: '84', change: '+24.5%', trend: 'up' as const, icon: Calendar, iconColor: 'text-pink-600' },
-        { title: 'Pipeline Value', value: '$142k', change: '+18.2%', trend: 'up' as const, icon: TrendingUp, iconColor: 'text-indigo-600' },
-    ];
+    const [kpis, setKpis] = useState<DashboardKPI[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchKPIs() {
+            try {
+                const { data, error } = await supabase
+                    .from('dashboard_kpis')
+                    .select('*')
+                    .order('created_at', { ascending: true });
+
+                if (error) throw error;
+
+                if (data) {
+                    setKpis(data);
+                }
+            } catch (err) {
+                console.error('Error fetching dashboard data:', err);
+                setError('Failed to load dashboard data');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchKPIs();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="flex h-64 items-center justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-600">
+                <AlertCircle className="mx-auto mb-2 h-8 w-8" />
+                <p>{error}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-6">
@@ -21,9 +69,20 @@ export default function Dashboard() {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {kpis.map((kpi, index) => (
-                    <KPICard key={index} {...kpi} />
-                ))}
+                {kpis.map((kpi) => {
+                    const IconComponent = ICON_MAP[kpi.icon_key] || Users;
+                    return (
+                        <KPICard
+                            key={kpi.id}
+                            title={kpi.title}
+                            value={kpi.value}
+                            change={kpi.change}
+                            trend={kpi.trend}
+                            icon={IconComponent}
+                            iconColor={kpi.icon_color}
+                        />
+                    );
+                })}
             </div>
 
             {/* Placeholder for charts/tables */}
