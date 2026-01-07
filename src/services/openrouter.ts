@@ -186,7 +186,8 @@ export class OpenRouterService {
             });
 
             if (!response.ok) {
-                throw new Error(`Stream error: ${response.statusText}`);
+                const errorText = await response.text();
+                throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`);
             }
 
             if (!response.body) throw new Error('ReadableStream not supported');
@@ -217,7 +218,7 @@ export class OpenRouterService {
                                 onChunk(content);
                             }
                         } catch (e) {
-                            console.warn('Error parsing stream chunk', e);
+                            console.warn('[OpenRouter] Error parsing stream chunk', e);
                         }
                     }
                 }
